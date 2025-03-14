@@ -39,6 +39,10 @@ def load_data(file):
         if 'libelle_etablissement' not in df.columns:
             df['libelle_etablissement'] = "Non disponible"
             
+        # Vérifier si la colonne demandeur_siret existe
+        if 'demandeur_siret' not in df.columns:
+            df['demandeur_siret'] = "Non disponible"
+            
         return df
     
     except Exception as e:
@@ -144,9 +148,9 @@ with tabs[0]:
                         st.subheader(f"Mobilité des apprenants - {', '.join(selected_countries)} - {selected_year}")
                         
                         # Sélectionner uniquement les colonnes requises
-                        display_columns = ["groupe_instructeur_label", "pays", "libelle_etablissement"]
+                        display_columns = ["groupe_instructeur_label", "pays", "libelle_etablissement", "demandeur_siret"]
                         display_df = filtered_df[display_columns].copy()
-                        display_df.columns = ["Region", "Pays", "Etablissement"]
+                        display_df.columns = ["Region", "Pays", "Etablissement", "SIRET"]
                         
                         # Afficher le nombre total de lignes
                         st.info(f"Nombre total d'enregistrements : {len(display_df)}")
@@ -246,9 +250,9 @@ with tabs[1]:
                         st.subheader(f"Mobilité du personnel - {', '.join(selected_countries)} - {selected_year}")
                         
                         # Sélectionner uniquement les colonnes requises
-                        display_columns = ["groupe_instructeur_label", "pays", "libelle_etablissement"]
+                        display_columns = ["groupe_instructeur_label", "pays", "libelle_etablissement", "demandeur_siret"]
                         display_df = filtered_df[display_columns].copy()
-                        display_df.columns = ["Region", "Pays", "Etablissement"]
+                        display_df.columns = ["Region", "Pays", "Etablissement", "SIRET"]
                         
                         # Afficher le nombre total de lignes
                         st.info(f"Nombre total d'enregistrements : {len(display_df)}")
