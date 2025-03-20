@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # Fonction pour charger et nettoyer les données
-def load_data(file):
+def load_data(file, type_mobilite="sortante"):
     try:
         # Déterminer le type de fichier
         if file.name.endswith('.csv'):
@@ -23,8 +23,12 @@ def load_data(file):
             st.error("Format de fichier non supporté. Veuillez charger un fichier CSV ou Excel.")
             return None
         
-        # Vérifier si les colonnes nécessaires existent
-        required_cols = ['pays', 'groupe_instructeur_label', 'date_depart']
+        # Vérifier les colonnes nécessaires en fonction du type de mobilité
+        if type_mobilite == "entrante":
+            required_cols = ['pays', 'groupe_instructeur_label', 'date_debut_mobilite_entrante']
+        else:
+            required_cols = ['pays', 'groupe_instructeur_label', 'date_depart']
+            
         missing_cols = [col for col in required_cols if col not in df.columns]
         
         if missing_cols:
@@ -32,8 +36,12 @@ def load_data(file):
             return None
         
         # Nettoyer les données
-        df['date_depart'] = pd.to_datetime(df['date_depart'], errors='coerce')
-        df['annee'] = df['date_depart'].dt.year
+        if type_mobilite == "entrante":
+            df['date_debut_mobilite_entrante'] = pd.to_datetime(df['date_debut_mobilite_entrante'], errors='coerce')
+            df['annee'] = df['date_debut_mobilite_entrante'].dt.year
+        else:
+            df['date_depart'] = pd.to_datetime(df['date_depart'], errors='coerce')
+            df['annee'] = df['date_depart'].dt.year
         
         # Vérifier si la colonne libelle_etablissement existe
         if 'libelle_etablissement' not in df.columns:
@@ -85,7 +93,7 @@ with tabs[0]:
         uploaded_file = st.file_uploader("Télécharger le fichier de mobilité apprenants", type=["csv", "xlsx", "xls"], key="apprenants_file")
     
     if uploaded_file is not None:
-        data["apprenants"] = load_data(uploaded_file)
+        data["apprenants"] = load_data(uploaded_file, type_mobilite="sortante")
         
         if data["apprenants"] is not None:
             st.write(f"Total des enregistrements: {len(data['apprenants'])}")
@@ -180,7 +188,7 @@ with tabs[1]:
         uploaded_file = st.file_uploader("Télécharger le fichier de mobilité personnel", type=["csv", "xlsx", "xls"], key="personnel_file")
     
     if uploaded_file is not None:
-        data["personnel"] = load_data(uploaded_file)
+        data["personnel"] = load_data(uploaded_file, type_mobilite="sortante")
         
         if data["personnel"] is not None:
             st.write(f"Total des enregistrements: {len(data['personnel'])}")
@@ -278,7 +286,7 @@ with tabs[2]:
         uploaded_file = st.file_uploader("Télécharger le fichier de mobilité collective", type=["csv", "xlsx", "xls"], key="collective_file")
     
     if uploaded_file is not None:
-        data["collective"] = load_data(uploaded_file)
+        data["collective"] = load_data(uploaded_file, type_mobilite="sortante")
         
         if data["collective"] is not None:
             st.write(f"Total des enregistrements: {len(data['collective'])}")
@@ -376,7 +384,7 @@ with tabs[3]:
         uploaded_file = st.file_uploader("Télécharger le fichier de mobilité entrante", type=["csv", "xlsx", "xls"], key="entrante_file")
     
     if uploaded_file is not None:
-        data["entrante"] = load_data(uploaded_file)
+        data["entrante"] = load_data(uploaded_file, type_mobilite="entrante")
         
         if data["entrante"] is not None:
             st.write(f"Total des enregistrements: {len(data['entrante'])}")
